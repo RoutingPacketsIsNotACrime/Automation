@@ -1,0 +1,74 @@
+acl manager proto cache_object
+acl localhost src 127.0.0.1/32 ::1
+acl to_localhost dst 127.0.0.0/8 0.0.0.0/32 ::1
+
+acl localnet src 10.0.0.0/8     # RFC1918 possible internal network
+acl localnet src 172.16.0.0/12  # RFC1918 possible internal network
+acl localnet src 192.168.0.0/16 # RFC1918 possible internal network
+acl localnet src fc00::/7       # RFC 4193 local private network range
+acl localnet src fe80::/10      # RFC 4291 link-local (directly plugged) machines
+
+#Most people aren't going to have access to the BGP config so this is commented out for the moment
+#acl uk_net src "/etc/squid/prefixes.txt"
+
+acl SSL_ports port 443
+acl Safe_ports port 80          # http
+acl Safe_ports port 443         # https
+acl CONNECT method CONNECT
+
+http_access allow manager localhost
+http_access deny manager
+
+acl whitelist dstdomain "/etc/squid/whitelist.txt"
+
+http_access deny !Safe_ports
+
+http_access deny CONNECT !SSL_ports
+
+http_access deny !whitelist
+
+
+http_access allow localnet
+http_access allow localhost
+#http_access allow uk_net
+http_access allow all
+
+http_access deny all
+
+http_port 3128
+http_port 8080
+
+hierarchy_stoplist cgi-bin ?
+
+visible_hostname <%= @node[:hostname] %>
+
+cache_replacement_policy heap LFUDA
+cache_swap_low 90
+cache_swap_high 95
+maximum_object_size_in_memory 50 KB
+cache_dir aufs /var/spool/squid 40000 16 256
+cache_mem 10000 MB
+logfile_rotate 10
+memory_pools off
+maximum_object_size 50 MB
+quick_abort_min 0 KB
+quick_abort_max 0 KB
+log_icp_queries off
+client_db off
+buffered_logs on
+half_closed_clients off
+
+snmp_port 3401
+acl snmppublic snmp_community public
+snmp_access allow snmppublic all
+snmp_incoming_address 0.0.0.0
+snmp_outgoing_address 255.255.255.255
+
+coredump_dir /var/spool/squid
+
+error_directory /etc/squid/error
+refresh_pattern ^ftp:           1440    20%     10080
+refresh_pattern ^gopher:        1440    0%      1440
+refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
+refresh_pattern .               0       20%     4320
+

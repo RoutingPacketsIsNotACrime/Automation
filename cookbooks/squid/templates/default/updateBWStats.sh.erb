@@ -1,0 +1,18 @@
+#!/bin/bash
+
+ifstat -T -b 1 10 > /tmp/bw_stats
+
+tail -n 10 /tmp/bw_stats | awk '{print $4}' > /tmp/bw_stats_cooked
+
+str=""
+for stat in `cat /tmp/bw_stats_cooked`
+do
+        echo $stat
+        concat="$str,$stat"
+        str=$concat
+done
+
+echo $str
+
+curl -v "<%= @node[:packetflagon][:frontend][:root] %>/bw.php?host=`hostname -s`&bw=$str"
+

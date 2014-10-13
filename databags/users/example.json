@@ -1,0 +1,16 @@
+{
+  "groups": [
+    "pfadmin"
+  ],
+  "auth_basic": "",
+  "files": {
+    ".vimrc": "set background=dark\nsyntax enable\nset expandtab\nset tabstop=4"
+  },
+  "id": "euser",
+  "uid": 8000,
+  "full_name": "Example user",
+  "ssh_key": "ssh-rsa AAAAB3NzaC1y2AADQBABQt6KBcwTJr9af7ELefE5EREYiObqYUqT2pFn9O5y03bya+gP9hjWzqa9sEy5VHKF4tVeKlAksUIDlNcKt+NXSG1VWBiRngMHdoXFymfsCkJI/GO8AP6mhQ4BeqSSzjL0WgxNc0NlNHTM3Bhu9nD2+XWYHWHryC9ajpQgAg3CJ example@example.com",
+  "password": "",
+  "email": "example@example.com",
+  "yubikey": "cccccccccccc"
+}
