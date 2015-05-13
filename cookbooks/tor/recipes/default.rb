@@ -56,29 +56,41 @@ if(installpackages.length > 0)
 end
 
 service "tor" do
-  action [ :enable, :start ]
+  action [ :enable, :nothing ]
 end
 
+TorDomain = "packetflagon.is"
+Contact = "0xDE731050 Gareth Llewellyn <gareth@networksaremadeofstring.com>"
+
+if node.chef_environment == "BrassHornCommunications"
+	TorDomain = "BrassHornCommunications.uk"
+	Contact = "0x6F6D60C1 Security Dept <hello@brasshorncommunications.uk>"
+end
+
+FingerPrints = ""
 
 template "/etc/tor/torrc" do
   source "torrc.erb"
   owner "root"
   group "root"
   mode 0644
-  notifies :restart, resources(:service => "tor")
+  notifies :reload, resources(:service => "tor")
+  variables ({
+	:torDomain => TorDomain,
+	:contact => Contact
+  })
 end
-
 
 
 fingerprint=`tor --list-fingerprint | egrep "[A-F0-9]{32}" | awk '{print $13}' | sed "s/'//g"`
 node.default[:tor_fingerprint] = fingerprint
 
 service "iptables" do
-  action [ :enable, :start ]
+  action [ :enable, :nothing ]
 end
 
 service "ip6tables" do
-  action [ :enable, :start ]
+  action [ :enable, :nothing ]
 end
 
 template "/etc/sysconfig/iptables" do
